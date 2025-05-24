@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Création de Devis - Minecraft Server</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3.11.0/dist/email.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --secondary-color: #1976D2;
+            --dark-color: #0D47A1;
+            --light-color: #BBDEFB;
+            --text-color: #333;
+            --background-color: #f5f5f5;
+            --hover-color: #64B5F6;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, rgba(227, 242, 253, 0.1) 0%, rgba(187, 222, 251, 0.3) 100%),
+                        url('websiteLuscianaFrontend/img/snkPalaisRender.jpg') center/cover no-repeat fixed;
+            color: var(--text-color);
+            padding: 2rem;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(0.2px);
+            z-index: -1;
+        }
+
+        .devis-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .devis-container h1 {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--dark-color);
+            font-size: 3rem;
+            position: relative;
+            padding-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .devis-container h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 2.5rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(33, 150, 243, 0.1);
+        }
+
+        .form-group:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(33, 150, 243, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 1.1rem;
+        }
+
+        .form-group p {
+            margin-top: 0.8rem;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .radio-group, .checkbox-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .radio-option, .checkbox-option {
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid var(--light-color);
+            border-radius: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .radio-option:hover, .checkbox-option:hover {
+            background: var(--light-color);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .radio-option input[type="radio"],
+        .checkbox-option input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        /* Style des boutons radio */
+        .radio-mark {
+            width: 22px;
+            height: 22px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
+            display: inline-block;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        .radio-option:hover .radio-mark {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+        }
+
+        .radio-option input:checked ~ .radio-mark {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .radio-option input:checked ~ .radio-mark::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: radioCheck 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* Style des cases à cocher */
+        .checkmark {
+            width: 22px;
+            height: 22px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 6px;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
+            display: inline-block;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        .checkbox-option:hover .checkmark {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+            border-color: var(--secondary-color);
+        }
+
+        .checkbox-option input:checked ~ .checkmark {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            animation: checkmarkPop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .checkbox-option input:checked ~ .checkmark::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg) scale(0);
+            animation: checkmarkDraw 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes checkmarkPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes checkmarkDraw {
+            0% {
+                transform: rotate(45deg) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: rotate(45deg) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(45deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .checkbox-option input:checked ~ span:not(.checkmark) {
+            color: var(--dark-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        /* Animations */
+        @keyframes radioCheck {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .radio-option input:checked ~ span:not(.radio-mark),
+        .checkbox-option input:checked ~ span:not(.checkmark) {
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        .build-size-input, .organique-input, .date-input, .besoins-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--light-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .build-size-input:focus, .organique-input:focus, .date-input:focus, .besoins-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #4a90e2, #2c3e50);
+            padding: 1.5rem;
+            font-size: 1.3rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(44, 62, 80, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: white;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(44, 62, 80, 0.4);
+            background: linear-gradient(135deg, #2c3e50, #1a252f);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .submit-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .submit-button:hover::before {
+            left: 100%;
+        }
+
+        .submit-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+
+        .loading-message {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .loading-message i {
+            font-size: 4em;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-message p {
+            margin: 0;
+            font-size: 1.2em;
+            color: var(--dark-color);
+        }
+
+        /* Animation au scroll */
+        .form-group {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .form-group.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Style pour les inputs numériques */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Style pour le textarea */
+        .besoins-input {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        /* Style pour les sections d'organiques */
+        #organiquesDetails {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        #organiquesDetails.visible {
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Style pour la liste déroulante personnalisée */
+        .select-wrapper {
+            position: relative;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--light-color);
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            transition: all 0.3s ease;
+        }
+
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .select-wrapper:hover::after {
+            color: var(--secondary-color);
+        }
+
+        .select-wrapper select:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.15);
+        }
+
+        .select-wrapper select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+        }
+
+        .select-wrapper select option {
+            padding: 1rem;
+            font-size: 1rem;
+            background: white;
+            color: var(--text-color);
+        }
+
+        .select-wrapper select option:hover {
+            background: var(--light-color);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-message">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Envoi du formulaire en cours. Cela peut prendre un moment...</p>
+        </div>
+    </div>
+
+    <div class="devis-container">
+        <h1>Création de Devis</h1>
+        <form id="devisForm">
+            <div class="form-group">
+                <label for="pseudo">Votre pseudo :</label>
+                <input type="text" id="pseudo" name="pseudo" class="build-size-input" required>
+                <p>Le pseudo sera utilisé pour identifier votre demande.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="buildSize">Taille du build désirée :</label>
+                <div class="build-size-group">
+                    <input type="number" id="buildSize" name="buildSize" class="build-size-input" min="100" max="1000" required>
+                    <span class="build-size-unit">x</span>
+                </div>
+                <p>La taille du build est un facteur très important à prendre en compte.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="version">Version du build :</label>
+                <div class="select-wrapper">
+                    <select id="version" name="version" required>
+                        <option value="" disabled selected>Sélectionnez une version</option>
+                        <option value="1.6.4">Minecraft 1.6.4</option>
+                        <option value="1.7.2">Minecraft 1.7.2</option>
+                        <option value="1.7.10">Minecraft 1.7.10</option>
+                        <option value="1.8">Minecraft 1.8</option>
+                        <option value="1.8.8">Minecraft 1.8.8</option>
+                        <option value="1.8.9">Minecraft 1.8.9</option>
+                        <option value="1.9">Minecraft 1.9</option>
+                        <option value="1.9.4">Minecraft 1.9.4</option>
+                        <option value="1.10">Minecraft 1.10</option>
+                        <option value="1.10.2">Minecraft 1.10.2</option>
+                        <option value="1.11">Minecraft 1.11</option>
+                        <option value="1.11.2">Minecraft 1.11.2</option>
+                        <option value="1.12">Minecraft 1.12</option>
+                        <option value="1.12.1">Minecraft 1.12.1</option>
+                        <option value="1.12.2">Minecraft 1.12.2</option>
+                        <option value="1.13">Minecraft 1.13</option>
+                        <option value="1.13.1">Minecraft 1.13.1</option>
+                        <option value="1.13.2">Minecraft 1.13.2</option>
+                        <option value="1.14">Minecraft 1.14</option>
+                        <option value="1.14.1">Minecraft 1.14.1</option>
+                        <option value="1.14.2">Minecraft 1.14.2</option>
+                        <option value="1.14.3">Minecraft 1.14.3</option>
+                        <option value="1.14.4">Minecraft 1.14.4</option>
+                        <option value="1.15">Minecraft 1.15</option>
+                        <option value="1.15.1">Minecraft 1.15.1</option>
+                        <option value="1.15.2">Minecraft 1.15.2</option>
+                        <option value="1.16">Minecraft 1.16</option>
+                        <option value="1.16.1">Minecraft 1.16.1</option>
+                        <option value="1.16.2">Minecraft 1.16.2</option>
+                        <option value="1.16.3">Minecraft 1.16.3</option>
+                        <option value="1.16.4">Minecraft 1.16.4</option>
+                        <option value="1.16.5">Minecraft 1.16.5</option>
+                        <option value="1.17">Minecraft 1.17</option>
+                        <option value="1.17.1">Minecraft 1.17.1</option>
+                        <option value="1.18">Minecraft 1.18</option>
+                        <option value="1.18.1">Minecraft 1.18.1</option>
+                        <option value="1.18.2">Minecraft 1.18.2</option>
+                        <option value="1.19">Minecraft 1.19</option>
+                        <option value="1.19.1">Minecraft 1.19.1</option>
+                        <option value="1.19.2">Minecraft 1.19.2</option>
+                        <option value="1.19.3">Minecraft 1.19.3</option>
+                        <option value="1.19.4">Minecraft 1.19.4</option>
+                        <option value="1.20">Minecraft 1.20</option>
+                        <option value="1.20.1">Minecraft 1.20.1</option>
+                        <option value="1.20.2">Minecraft 1.20.2</option>
+                        <option value="1.20.3">Minecraft 1.20.3</option>
+                        <option value="1.20.4">Minecraft 1.20.4</option>
+                        <option value="1.21">Minecraft 1.21</option>
+                        <option value="1.21.1">Minecraft 1.21.1</option>
+                        <option value="1.21.2">Minecraft 1.21.2</option>
+                        <option value="1.21.3">Minecraft 1.21.3</option>
+                        <option value="1.21.4">Minecraft 1.21.4</option>
+                        <option value="1.21.5">Minecraft 1.21.5</option>
+                    </select>
+                </div>
+                <p>La version de Minecraft est importante pour la compatibilité des blocs et des fonctionnalités.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Exclusivité du build</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="exclusivite" value="oui" required>
+                        <span class="radio-mark"></span>
+                        Oui
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="exclusivite" value="non">
+                        <span class="radio-mark"></span>
+                        Non
+                    </label>
+                </div>
+                <p>L'exclusivité signifie que le build ne sera pas revendu à d'autres clients.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Voulez-vous des organiques ?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="organiques" value="oui" required>
+                        <span class="radio-mark"></span>
+                        Oui
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="organiques" value="non">
+                        <span class="radio-mark"></span>
+                        Non
+                    </label>
+                </div>
+                <div id="organiquesDetails" style="display: none; margin-top: 1rem;">
+                    <div class="organique-size-group">
+                        <label>Grands organiques</label>
+                        <input type="number" name="organiques_grand" min="0" value="0" class="organique-input">
+                    </div>
+                    <div class="organique-size-group">
+                        <label>Moyens organiques</label>
+                        <input type="number" name="organiques_moyen" min="0" value="0" class="organique-input">
+                    </div>
+                    <div class="organique-size-group">
+                        <label>Petits organiques</label>
+                        <input type="number" name="organiques_petit" min="0" value="0" class="organique-input">
+                    </div>
+                </div>
+                <p id="organiquesMessage" style="display: none;">Les organiques sont un facteur important à prendre en compte.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Terraforming ?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="terraforming" value="oui" required>
+                        <span class="radio-mark"></span>
+                        Oui
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="terraforming" value="non">
+                        <span class="radio-mark"></span>
+                        Non
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Type d'eau ?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="eau" value="vraie" required>
+                        <span class="radio-mark"></span>
+                        Vraie eau
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="eau" value="fausse">
+                        <span class="radio-mark"></span>
+                        Fausse eau
+                    </label>
+                </div>
+                <p>La fausse eau est plus chère mais plus réaliste, la vraie eau est plus économique</p>
+            </div>
+
+            <div class="form-group">
+                <label>Type d'arbres ?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="arbres" value="homemade" required>
+                        <span class="radio-mark"></span>
+                        Homemade trees
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="arbres" value="bundle">
+                        <span class="radio-mark"></span>
+                        Bundle
+                    </label>
+                </div>
+                <p>Les homemade trees sont des arbres personnalisés, les bundles sont des packs d'arbres prêts à l'emploi</p>
+            </div>
+
+            <div class="form-group">
+                <label>Type de construction</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option">
+                        <input type="checkbox" name="type" value="interieur">
+                        <span class="checkmark"></span>
+                        Intérieur
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" name="type" value="exterieur">
+                        <span class="checkmark"></span>
+                        Extérieur
+                    </label>
+                </div>
+                <p>Les constructions intérieures sont généralement plus détaillées et plus chères</p>
+            </div>
+
+            <div class="form-group">
+                <label>Date d'approximation souhaitée</label>
+                <div class="date-group">
+                    <input type="number" name="jours" min="1" placeholder="Nombre de jours" class="date-input">
+                    <span class="date-text">jours</span>
+                </div>
+                <p>Indiquez le nombre de jours approximatif que vous souhaitez pour la réalisation</p>
+            </div>
+
+            <div class="form-group">
+                <label>Besoins précis</label>
+                <textarea name="besoins" rows="4" placeholder="Décrivez vos besoins précis ici... (ex: style de construction, thème, couleurs préférées, etc.)" class="besoins-input"></textarea>
+            </div>
+
+            <button type="submit" class="submit-button">Demander un devis</button>
+        </form>
+    </div>
+
+    <script>
+        // Initialisation d'EmailJS
+        (function() {
+            emailjs.init("hNzMZ5lGbf6FEGTs7");
+        })();
+
+        // Animation au scroll
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.form-group').forEach(group => {
+            observer.observe(group);
+        });
+
+        // Gestion de l'affichage de la taille
+        const buildSizeInput = document.getElementById('buildSize');
+        const buildSizeUnit = document.querySelector('.build-size-unit');
+
+        buildSizeInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            buildSizeUnit.textContent = `x ${value}`;
+        });
+
+        // Gestion de l'affichage des détails des organiques
+        document.querySelectorAll('input[name="organiques"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const details = document.getElementById('organiquesDetails');
+                const message = document.getElementById('organiquesMessage');
+                if (this.value === 'oui') {
+                    details.style.display = 'block';
+                    message.style.display = 'block';
+                } else {
+                    details.style.display = 'none';
+                    message.style.display = 'none';
+                }
+            });
+        });
+
+        document.getElementById('devisForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Afficher l'indicateur de chargement
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const submitButton = document.querySelector('.submit-button');
+            loadingOverlay.style.display = 'flex';
+            submitButton.disabled = true;
+            
+            try {
+                const formData = {
+                    pseudo: document.getElementById('pseudo').value,
+                    buildSize: document.getElementById('buildSize').value,
+                    version: document.getElementById('version').value,
+                    type: Array.from(document.querySelectorAll('input[name="type"]:checked')).map(cb => cb.value),
+                    exclusivite: document.querySelector('input[name="exclusivite"]:checked').value,
+                    organiques: document.querySelector('input[name="organiques"]:checked').value,
+                    organiquesDetails: {
+                        grand: document.querySelector('input[name="organiques_grand"]').value,
+                        moyen: document.querySelector('input[name="organiques_moyen"]').value,
+                        petit: document.querySelector('input[name="organiques_petit"]').value
+                    },
+                    terraforming: document.querySelector('input[name="terraforming"]:checked').value,
+                    eau: document.querySelector('input[name="eau"]:checked').value,
+                    arbres: document.querySelector('input[name="arbres"]:checked').value,
+                    besoins: document.querySelector('textarea[name="besoins"]').value,
+                    jours: document.querySelector('input[name="jours"]').value
+                };
+
+                // Calcul de la date de deadline
+                const today = new Date();
+                const deadline = new Date(today);
+                deadline.setDate(today.getDate() + parseInt(formData.jours));
+                
+                // Formatage des dates
+                const formatDate = (date) => {
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    return `${day}-${month}-${year}`;
+                };
+
+                const templateParams = {
+                    to_email: 'luscianabuilds@gmail.com',
+                    pseudo: formData.pseudo,
+                    buildSize: formData.buildSize,
+                    version: formData.version,
+                    type: formData.type.join(', '),
+                    exclusivite: formData.exclusivite,
+                    organiques: formData.organiques,
+                    organiquesOui: formData.organiques === 'oui',
+                    organiquesGrand: formData.organiquesDetails.grand,
+                    organiquesMoyen: formData.organiquesDetails.moyen,
+                    organiquesPetit: formData.organiquesDetails.petit,
+                    terraforming: formData.terraforming,
+                    eau: formData.eau,
+                    arbres: formData.arbres,
+                    date: `Deadline : ${formatDate(deadline)} - ${formData.jours} jours depuis (${formatDate(today)})`,
+                    dateToDay: formatDate(today),
+                    besoins: formData.besoins
+                };
+
+                // Envoi de l'email via EmailJS
+                await emailjs.send("service_lusciana", "template_3l2gkzn", templateParams);
+
+                alert('Votre demande de devis a été envoyée avec succès ! Nous vous contacterons bientôt.');
+                document.getElementById('devisForm').reset();
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Une erreur est survenue lors de l\'envoi du devis. Veuillez réessayer.');
+            } finally {
+                // Cacher l'indicateur de chargement
+                loadingOverlay.style.display = 'none';
+                submitButton.disabled = false;
+            }
+        });
+
+        // Fonction pour copier le JSON dans le presse-papier
+        function copyJsonToClipboard(encodedJson) {
+            const json = decodeURIComponent(encodedJson);
+            navigator.clipboard.writeText(json).then(() => {
+                alert('JSON copié dans le presse-papier !');
+            }).catch(err => {
+                console.error('Erreur lors de la copie :', err);
+                alert('Erreur lors de la copie du JSON');
+            });
+        }
+    </script>
+</body>
+</html> 
